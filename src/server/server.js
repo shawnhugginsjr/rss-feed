@@ -1,7 +1,8 @@
 const express = require('express')
 const sqlite = require('sqlite')
 const bodyParser = require('body-parser')
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
+const session = require('express-session');
 const app = express()
 const PORT = 8000
 const saltRounds = 10;
@@ -19,11 +20,23 @@ sql = {
     insertUser: 'INSERT INTO user (username, password_hash) VALUES (?, ?)'
 }
 
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}))
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
+
 app.post('/login', async (req, res, next) => {
+    if (req.session.username) {
+        res.redirect('/')
+        return
+    }
+
     try {
         const db = await dbPromise
         const user = await db.get(sql.findByUserName, req.body.user.username)
@@ -36,17 +49,35 @@ app.post('/login', async (req, res, next) => {
         }
         let feeds = await db.get(sql.allUserFeeds, user.id)
         feeds = feeds ? feeds : []
+        req.session.username = req.body.user.username
         res.send({ username: user.username, feeds: feeds })
     } catch (error) {
         next(error)
     }
 })
 
+app.post('/logout', async (req, res, next) => {
+    if (req.session.username) {
+        req.session.username = null
+        req.session.destroy((err) => {
+            res.redirect('/')
+        })
+    } else {
+        res.redirect('/')
+    }
+})
+
 app.post('/signup', async (req, res, next) => {
+    if (req.session.username) {
+        res.redirect('/')
+        return
+    }
+
     try {
         const db = await dbPromise
         const passwordHash = await bcrypt.hash(req.body.user.password, saltRounds)
         await db.run(sql.insertUser, req.body.user.username, passwordHash)
+        req.session.username = req.body.user.username
         res.send({
             username: req.body.user.username,
             feeds: []
