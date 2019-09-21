@@ -7,6 +7,7 @@
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-scripts": "3.1.2",
+    "sqlite": "^3.0.3",
     "sqlite3": "^4.1.0"
   },
   "scripts": {
