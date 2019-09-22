@@ -8,6 +8,7 @@ const app = express()
 const PORT = 8000
 const saltRounds = 10;
 const rssParser = new rParser();
+const code = require('./statusCodes')
 const sql = require('./sql')
 
 const max_item_count = 50
@@ -19,6 +20,16 @@ const dbPromise = Promise.resolve()
     .catch((error) => {
         console.log(`Server could not start: ${error}`)
     })
+
+/*
+* A helper function to support simple error handling.
+* A return may be required after calling this function to 
+* stop further request logic.
+*/
+const sendError = (res, statusCode, message) => {
+    res.status(statusCode)
+    res.send({ error: message })
+}
 
 app.use(session({
     secret: 'keyboard cat',
@@ -35,10 +46,11 @@ app.get('/', (req, res) => res.send('Hello World!'))
 * query paramter 'feedUrl' to the client.
 */
 app.get('/rss', async (req, res, next) => {
-    const feedUrl = req.query.feedUrl
     try {
+        const feedUrl = req.query.feedUrl
         if (!feedUrl) {
-            throw 'feedUrl query is required'
+            sendError(res, code.badRequest, 'query paramter "feedUrl" required is required.')
+            return
         }
 
         const jsonFeed = await rssParser.parseURL(feedUrl)
@@ -64,11 +76,12 @@ app.get('/rss', async (req, res, next) => {
 app.post('/feed', async (req, res, next) => {
     try {
         if (req.session.userID === undefined) {
-            throw 'You must be logged-in to save a feed'
+            sendError(res, code.unauthorized, 'User must be logged in to save a feed.')
+            return
         }
-
         if (!req.body.feedName || !req.body.feedUrl) {
-            throw 'Both the feed name and feed url are required'
+            sendError(res, code.badRequest, 'Both query parameters "feedName" and "feedUrl" are required.')
+            return
         }
 
         const db = await dbPromise
@@ -82,11 +95,11 @@ app.post('/feed', async (req, res, next) => {
 app.delete('/feed', async (req, res, next) => {
     try {
         if (req.session.userID === undefined) {
-            throw 'You must be logged-in to save a feed'
+            sendError(res, code.unauthorized, 'Must be logged in to delete a feed.')
+            return
         }
-
         if (!req.body.feedID) {
-            throw 'Feed ID is required to delete a feed'
+            sendError(code.badRequest, 'feedID is required to delete a feed.')
         }
 
         const db = await dbPromise
@@ -99,7 +112,7 @@ app.delete('/feed', async (req, res, next) => {
 
 app.post('/login', async (req, res, next) => {
     if (req.session.userID != undefined) {
-        res.redirect('/')
+        res.send({})
         return
     }
 
@@ -107,11 +120,13 @@ app.post('/login', async (req, res, next) => {
         const db = await dbPromise
         const user = await db.get(sql.findByUserName, req.body.user.username)
         if (!user) {
-            throw "username or password is incorrect"
+            sendError(res, code.notFound, 'User wasn\'t found')
+            return
         }
         const passwordsEqual = await bcrypt.compare(req.body.user.password, user.password_hash)
         if (!passwordsEqual) {
-            throw 'Username or password is incorrect'
+            sendError(res, code.unauthorized, 'Username or password is incorrect')
+            return
         }
         let feeds = await db.get(sql.allUserFeeds, user.id)
         feeds = feeds ? feeds : []
@@ -126,16 +141,16 @@ app.post('/logout', async (req, res, next) => {
     if (req.session.userID != undefined) {
         req.session.userID = undefined
         req.session.destroy((err) => {
-            res.send('User logged out')
+            res.send({})
         })
     } else {
-        res.send('Already logged out')
+        sendError(res, code.unauthorized, 'User was not logged in.')
     }
 })
 
 app.post('/signup', async (req, res, next) => {
     if (req.session.userID != undefined) {
-        res.redirect('/')
+        res.send({})
         return
     }
 
