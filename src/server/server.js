@@ -2,18 +2,19 @@ const express = require('express')
 const sqlite = require('sqlite')
 const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt')
-const session = require('express-session');
-const rParser = require('rss-parser');
-const app = express()
-const PORT = 8000
-const saltRounds = 10;
-const rssParser = new rParser();
+const session = require('express-session')
+const rParser = require('rss-parser')
 const code = require('./statusCodes')
 const sql = require('./sql')
+const app = express()
 
+const PORT = 8000
+const saltRounds = 10;
+const rssParser = new rParser()
 const max_item_count = 50
 const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
+// Resolves a database connection from the promise.
 const dbPromise = Promise.resolve()
     .then(() => sqlite.open('./database.sqlite', { Promise }))
     .then(db => db.migrate({ force: 'last' }))
@@ -37,6 +38,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }))
+
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => res.send('Hello World!'))
@@ -71,7 +73,7 @@ app.get('/rss', async (req, res, next) => {
 })
 
 /*
-* Save a feed to a user.
+* Save a feed for a user.
 */
 app.post('/feed', async (req, res, next) => {
     try {
@@ -92,6 +94,9 @@ app.post('/feed', async (req, res, next) => {
     }
 })
 
+/*
+* Delete a feed for a user by feed id.
+*/
 app.delete('/feed', async (req, res, next) => {
     try {
         if (req.session.userID === undefined) {
@@ -110,6 +115,10 @@ app.delete('/feed', async (req, res, next) => {
     }
 })
 
+/*
+* Create a session for the user and send them their username
+* and list of saved feeds.
+*/
 app.post('/login', async (req, res, next) => {
     if (req.session.userID != undefined) {
         res.send({})
@@ -137,6 +146,9 @@ app.post('/login', async (req, res, next) => {
     }
 })
 
+/*
+* Log out the user by clearing their session.
+*/
 app.post('/logout', async (req, res, next) => {
     if (req.session.userID != undefined) {
         req.session.userID = undefined
@@ -148,6 +160,9 @@ app.post('/logout', async (req, res, next) => {
     }
 })
 
+/*
+* Signup the user, create a session, and send their username.
+*/
 app.post('/signup', async (req, res, next) => {
     if (req.session.userID != undefined) {
         res.send({})
