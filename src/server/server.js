@@ -153,23 +153,4 @@ app.post('/signup', async (req, res, next) => {
     }
 })
 
-/*
-* A simple function to test interfacing with SQLite.
-*/
-app.get('/test', async (req, res, next) => {
-    try {
-        const db = await dbPromise
-        const [users, feeds] = await Promise.all([
-            db.get('SELECT * FROM user WHERE id = ?', 0),
-            db.all('SELECT * FROM feed WHERE id = ?', 0)
-        ])
-        res.send({
-            user: users,
-            feeds: feeds
-        })
-    } catch (error) {
-        next(error)
-    }
-})
-
 app.listen(PORT, () => console.log(`RSS server listening on port ${PORT}!`))
