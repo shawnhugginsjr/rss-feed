@@ -3,10 +3,15 @@ const sqlite = require('sqlite')
 const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt')
 const session = require('express-session');
+const rParser = require('rss-parser');
 const app = express()
 const PORT = 8000
 const saltRounds = 10;
+const rssParser = new rParser();
 const sql = require('./sql')
+
+const max_item_count = 50
+const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
 const dbPromise = Promise.resolve()
     .then(() => sqlite.open('./database.sqlite', { Promise }))
@@ -24,6 +29,34 @@ app.use(session({
 app.use(bodyParser.json())
 
 app.get('/', (req, res) => res.send('Hello World!'))
+
+/*
+* Sends a JSON format of the RSS feed specified by the
+* query paramter 'feedUrl' to the client.
+*/
+app.get('/rss', async (req, res, next) => {
+    const feedUrl = req.query.feedUrl
+    try {
+        if (!feedUrl) {
+            throw 'feedUrl query is required'
+        }
+
+        const jsonFeed = await rssParser.parseURL(feedUrl)
+
+        if (jsonFeed.items.length > max_item_count) {
+            jsonFeed.items = jsonFeed.items.splice(0, max_item_count)
+        }
+        jsonFeed.imgArticleCount = 0
+        jsonFeed.items.forEach((item) => {
+            if (item.enclosure && img_mime_type_set.has(item.enclosure.type)) {
+                jsonFeed.imgArticleCount += 1
+            }
+        })
+        res.send(jsonFeed)
+    } catch (error) {
+        next(error)
+    }
+})
 
 /*
 * Save a feed to a user.
