@@ -32,7 +32,7 @@ app.get('/', (req, res) => res.send('Hello World!'))
 
 
 app.post('/login', async (req, res, next) => {
-    if (req.session.username) {
+    if (req.session.userID) {
         res.redirect('/')
         return
     }
@@ -49,7 +49,7 @@ app.post('/login', async (req, res, next) => {
         }
         let feeds = await db.get(sql.allUserFeeds, user.id)
         feeds = feeds ? feeds : []
-        req.session.username = req.body.user.username
+        req.session.userID = user.id
         res.send({ username: user.username, feeds: feeds })
     } catch (error) {
         next(error)
@@ -57,18 +57,18 @@ app.post('/login', async (req, res, next) => {
 })
 
 app.post('/logout', async (req, res, next) => {
-    if (req.session.username) {
-        req.session.username = null
+    if (req.session.userID) {
+        req.session.userID = null
         req.session.destroy((err) => {
-            res.redirect('/')
+            res.send('User logged out')
         })
     } else {
-        res.redirect('/')
+        res.send('Already logged out')
     }
 })
 
 app.post('/signup', async (req, res, next) => {
-    if (req.session.username) {
+    if (req.session.userID) {
         res.redirect('/')
         return
     }
@@ -76,8 +76,8 @@ app.post('/signup', async (req, res, next) => {
     try {
         const db = await dbPromise
         const passwordHash = await bcrypt.hash(req.body.user.password, saltRounds)
-        await db.run(sql.insertUser, req.body.user.username, passwordHash)
-        req.session.username = req.body.user.username
+        const queryResult = await db.run(sql.insertUser, req.body.user.username, passwordHash)
+        req.session.userID = queryResult.lastID
         res.send({
             username: req.body.user.username,
             feeds: []
