@@ -17,7 +17,9 @@ const dbPromise = Promise.resolve()
 sql = {
     findByUserName: 'SELECT * FROM user WHERE username = ?',
     allUserFeeds: 'SELECT id, name, url FROM feed WHERE fk_user_id = ?',
-    insertUser: 'INSERT INTO user (username, password_hash) VALUES (?, ?)'
+    insertUser: 'INSERT INTO user (username, password_hash) VALUES (?, ?)',
+    followFeed: 'INSERT INTO feed (name, url, fk_user_id) VALUES (?,?,?)',
+    deleteFeed: "DELETE FROM feed WHERE fk_user_id = ? AND id = ?",
 }
 
 app.use(session({
@@ -30,9 +32,47 @@ app.use(bodyParser.json())
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
+/*
+* Save a feed to a user.
+*/
+app.post('/feed', async (req, res, next) => {
+    try {
+        if (req.session.userID === undefined) {
+            throw 'You must be logged-in to save a feed'
+        }
+
+        if (!req.body.feedName || !req.body.feedUrl) {
+            throw 'Both the feed name and feed url are required'
+        }
+
+        const db = await dbPromise
+        await db.run(sql.followFeed, req.body.feedName, req.body.feedUrl, req.session.userID)
+        res.send('ok')
+    } catch (error) {
+        next(error)
+    }
+})
+
+app.delete('/feed', async (req, res, next) => {
+    try {
+        if (req.session.userID === undefined) {
+            throw 'You must be logged-in to save a feed'
+        }
+
+        if (!req.body.feedID) {
+            throw 'Feed ID is required to delete a feed'
+        }
+
+        const db = await dbPromise
+        await db.run(sql.deleteFeed, req.session.userID, req.body.feedID)
+        res.send('feed deleted')
+    } catch (error) {
+        next(error)
+    }
+})
 
 app.post('/login', async (req, res, next) => {
-    if (req.session.userID) {
+    if (req.session.userID != undefined) {
         res.redirect('/')
         return
     }
@@ -57,8 +97,8 @@ app.post('/login', async (req, res, next) => {
 })
 
 app.post('/logout', async (req, res, next) => {
-    if (req.session.userID) {
-        req.session.userID = null
+    if (req.session.userID != undefined) {
+        req.session.userID = undefined
         req.session.destroy((err) => {
             res.send('User logged out')
         })
@@ -68,7 +108,7 @@ app.post('/logout', async (req, res, next) => {
 })
 
 app.post('/signup', async (req, res, next) => {
-    if (req.session.userID) {
+    if (req.session.userID != undefined) {
         res.redirect('/')
         return
     }
