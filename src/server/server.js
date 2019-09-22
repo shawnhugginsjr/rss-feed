@@ -6,6 +6,7 @@ const session = require('express-session');
 const app = express()
 const PORT = 8000
 const saltRounds = 10;
+const sql = require('./sql')
 
 const dbPromise = Promise.resolve()
     .then(() => sqlite.open('./database.sqlite', { Promise }))
@@ -13,14 +14,6 @@ const dbPromise = Promise.resolve()
     .catch((error) => {
         console.log(`Server could not start: ${error}`)
     })
-
-sql = {
-    findByUserName: 'SELECT * FROM user WHERE username = ?',
-    allUserFeeds: 'SELECT id, name, url FROM feed WHERE fk_user_id = ?',
-    insertUser: 'INSERT INTO user (username, password_hash) VALUES (?, ?)',
-    followFeed: 'INSERT INTO feed (name, url, fk_user_id) VALUES (?,?,?)',
-    deleteFeed: "DELETE FROM feed WHERE fk_user_id = ? AND id = ?",
-}
 
 app.use(session({
     secret: 'keyboard cat',
