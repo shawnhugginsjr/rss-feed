@@ -3,20 +3,23 @@ import { FeedItemList } from '../../components/FeedItemList'
 import { RssSearch } from '../../components/RssSearch'
 const queryString = require('query-string')
 
-export function Rss({ location, history }) {
+export function Rss({ location, history, user }) {
   const [feed, setFeed] = useState(null)
   const [feedUrl, setFeedUrl] = useState(null)
   const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
   useEffect(() => {
+    console.log(user)
     const queryStrings = queryString.parse(location.search)
 
     if (!queryStrings.feedUrl) {
       setFeed(null)
+      return
     }
     if (queryStrings.feedUrl !== feedUrl) {
       setFeedUrl(queryStrings.feedUrl)
       setFeed(null)
+      return
     }
 
     if (!feed) {

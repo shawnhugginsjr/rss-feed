@@ -29,7 +29,7 @@ const dbPromise = Promise.resolve()
 */
 const sendError = (res, statusCode, message) => {
     res.status(statusCode)
-    res.send({ error: message })
+    res.send({ error: { message: message } })
 }
 
 app.use(morgan(function (tokens, req, res) {
@@ -121,7 +121,8 @@ app.delete('/feed', async (req, res, next) => {
 
 /*
 * Create a session for the user and send them their username
-* and list of saved feeds.
+* and list of saved feeds. An empty JSON object is sent if the
+* user is already logged in.
 */
 app.post('/login', async (req, res, next) => {
     if (req.session.userID != undefined) {
@@ -157,10 +158,37 @@ app.post('/logout', async (req, res, next) => {
     if (req.session.userID != undefined) {
         req.session.userID = undefined
         req.session.destroy((err) => {
+            res.clearCookie('rss-user')
             res.send({})
         })
     } else {
         sendError(res, code.unauthorized, 'User was not logged in.')
+    }
+})
+
+/*
+* Sends user data to client using the rss-user cookie if it is valid.
+*/
+app.get('/sync', async (req, res, next) => {
+    if (req.session.userID != undefined) {
+        try {
+            const db = await dbPromise
+            let feeds = await db.get(sql.allUserFeeds, req.session.userID)
+            feeds = feeds ? feeds : []
+            const user = await db.get(sql.findByUserID, req.session.userID)
+            res.send({
+                username: user.username,
+                feeds: feeds
+            })
+        } catch (error) {
+            next(error)
+        }
+    } else {
+        req.session.userID = undefined
+        req.session.destroy((err) => {
+            res.clearCookie('rss-user')
+            sendError(res, code.unauthorized, 'Cookie not valid')
+        })
     }
 })
 
@@ -174,7 +202,18 @@ app.post('/signup', async (req, res, next) => {
     }
 
     try {
+        if (!req.body.user.username || !req.body.user.password) {
+            sendError(res, code.badRequest, 'Both username and password are required.')
+            return
+        }
+
         const db = await dbPromise
+        const user = await db.get(sql.findByUserName, req.body.user.username)
+        if (user) {
+            sendError(res, code.unauthorized, 'That username is already being used.')
+            return
+        }
+
         const passwordHash = await bcrypt.hash(req.body.user.password, saltRounds)
         const queryResult = await db.run(sql.insertUser, req.body.user.username, passwordHash)
         req.session.userID = queryResult.lastID
