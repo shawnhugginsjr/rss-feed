@@ -13,7 +13,6 @@ const PORT = 8000
 const saltRounds = 10;
 const rssParser = new rParser()
 const max_item_count = 50
-const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
 // Resolves a database connection from the promise.
 const dbPromise = Promise.resolve()
