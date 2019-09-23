@@ -30,8 +30,6 @@ export function Rss({ location, history, user }) {
           setFeed(jsonFeed)
         })
         .catch((error) => console.log(error))
-    } else {
-      prepareFeed(feed)
     }
   })
 
