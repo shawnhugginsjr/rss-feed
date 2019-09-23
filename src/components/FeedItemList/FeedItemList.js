@@ -10,7 +10,7 @@ export function FeedItemList({ feedItemArray }) {
         feedItems.push(<FeedItem key={index} feedItem={item} />)
     }
     return (
-        <div className='feed-item-list col-md-8 offset-md-2'>
+        <div className='feed-item-list'>
             {feedItems}
         </div>
 

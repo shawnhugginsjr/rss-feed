@@ -1,0 +1,13 @@
+.sidebar {
+    width: 300px;
+    background-color: yellowgreen;
+    position: fixed;
+    top: 0;
+    height: 100%;
+    margin-right: 10px;
+}
+
+.right-side {
+    padding-top: 60px;
+    margin-left: 330px;
+}

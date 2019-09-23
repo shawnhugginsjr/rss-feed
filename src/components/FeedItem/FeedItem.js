@@ -15,9 +15,9 @@ export function FeedItem({ feedItem }) {
     }
 
     return (
-        <div className='feed-item row'>
-            <div className='col-md-3'></div>
-            <div className="content col-md-9">
+        <div className='feed-item'>
+            <div></div>
+            <div>
                 <div>
                     <a href={link}>{title}</a>
                 </div>

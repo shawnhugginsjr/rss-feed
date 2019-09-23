@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { FeedItemList } from '../../components/FeedItemList'
+import { UserFeedItemList } from '../../components/UserFeedItemList'
 import { RssSearch } from '../../components/RssSearch'
+import { Link } from 'react-router-dom'
+import './styles.css'
 const queryString = require('query-string')
 
 export function Rss({ location, history, user }) {
@@ -9,7 +12,6 @@ export function Rss({ location, history, user }) {
   const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
   useEffect(() => {
-    console.log(user)
     const queryStrings = queryString.parse(location.search)
 
     if (!queryStrings.feedUrl) {
@@ -33,13 +35,6 @@ export function Rss({ location, history, user }) {
     }
   })
 
-  const searchFeed = (e) => {
-    e.preventDefault()
-    if (e.keyCode == 13) {
-      history.push(`rss?feedUrl=${e.target.value}`)
-    }
-  }
-
   const prepareFeed = (feed) => {
     if (feed.imgArticleCount) {
       return
@@ -59,20 +54,83 @@ export function Rss({ location, history, user }) {
     return `${feed.items.length} Articles / ${feed.imgArticleCount} Article Images`
   }
 
-  if (!feed) {
-    return (
-      <div className='container'>
-        <RssSearch onEnterHandler={searchFeed} />
-      </div>)
-  } else {
-    return (
-      <div className='container'>
-        <RssSearch onEnterHandler={searchFeed} />
-        <h2>{feed.title}</h2>
-        <span>{reportArticles(feed)}</span>
+  const searchFeed = (e) => {
+    e.preventDefault()
+    if (e.keyCode == 13) {
+      history.push(`rss?feedUrl=${e.target.value}`)
+    }
+  }
 
+  return (
+    <div>
+      <div className='sidebar'>
+        <UserSideBar user={user} />
+      </div>
+      <div className='right-side'>
+        <RightContent onEnterHandler={searchFeed} user={user} feed={feed} />
+      </div>
+    </div>
+  )
+}
+
+const RightContent = ({ feed, user, onEnterHandler }) => {
+  let jsx = (null)
+  if (feed) {
+    jsx = (
+      <div>
+        <AuthButtons user={user} />
+        <RssSearch onEnterHandler={onEnterHandler} />
+        <h2>{feed.title}</h2>
+        <span>{`${feed.items.length} Articles / ${feed.imgArticleCount} Article Images`}</span>
         <FeedItemList feedItemArray={feed.items} />
       </div>
     )
+  } else {
+    jsx = (
+      <div>
+        <AuthButtons user={user} />
+        <RssSearch onEnterHandler={onEnterHandler} />
+      </div>
+    )
   }
+  return jsx
 }
+
+const UserSideBar = ({ user }) => {
+  let jsx = (null)
+  if (user) {
+    jsx = (
+      <div className='content'>
+        <UserFeedItemList userFeedItemArray={user.feeds} />
+      </div>
+    )
+  } else {
+    jsx = (
+      <div></div>
+    )
+  }
+  return jsx
+}
+
+const AuthButtons = ({ user }) => {
+  let jsx = (null)
+  if (!user) {
+    jsx = (
+      <div>
+        <Link
+          className="btn btn-pink"
+          role="button"
+          to="/signin">
+          signin
+          </Link>
+        <Link
+          className="btn btn-pink"
+          role="button"
+          to="/signup">
+          signup
+          </Link>
+      </div>
+    )
+  }
+  return jsx
+} 

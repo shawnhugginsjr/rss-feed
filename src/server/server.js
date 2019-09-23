@@ -142,7 +142,7 @@ app.post('/login', async (req, res, next) => {
             sendError(res, code.unauthorized, 'Username or password is incorrect')
             return
         }
-        let feeds = await db.get(sql.allUserFeeds, user.id)
+        let feeds = await db.all(sql.allUserFeeds, user.id)
         feeds = feeds ? feeds : []
         req.session.userID = user.id
         res.send({ username: user.username, feeds: feeds })
@@ -173,7 +173,7 @@ app.get('/sync', async (req, res, next) => {
     if (req.session.userID != undefined) {
         try {
             const db = await dbPromise
-            let feeds = await db.get(sql.allUserFeeds, req.session.userID)
+            let feeds = await db.all(sql.allUserFeeds, req.session.userID)
             feeds = feeds ? feeds : []
             const user = await db.get(sql.findByUserID, req.session.userID)
             res.send({
