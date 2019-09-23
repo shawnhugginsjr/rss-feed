@@ -43,7 +43,8 @@ app.use(morgan(function (tokens, req, res) {
 }))
 
 app.use(session({
-    secret: 'keyboard cat',
+    name: 'rss-user',
+    secret: 'secret',
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }
@@ -66,16 +67,9 @@ app.get('/rss', async (req, res, next) => {
         }
 
         const jsonFeed = await rssParser.parseURL(feedUrl)
-
         if (jsonFeed.items.length > max_item_count) {
             jsonFeed.items = jsonFeed.items.splice(0, max_item_count)
         }
-        jsonFeed.imgArticleCount = 0
-        jsonFeed.items.forEach((item) => {
-            if (item.enclosure && img_mime_type_set.has(item.enclosure.type)) {
-                jsonFeed.imgArticleCount += 1
-            }
-        })
         res.send(jsonFeed)
     } catch (error) {
         next(error)
