@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { FeedItemList } from '../../components/FeedItemList'
+import { RssSearch } from '../../components/RssSearch'
 const queryString = require('query-string')
 
 export function Rss({ location, history }) {
-  const [feed, saveFeed] = useState(null)
+  const [feed, setFeed] = useState(null)
+  const [feedUrl, setFeedUrl] = useState(null)
   const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
   useEffect(() => {
     const queryStrings = queryString.parse(location.search)
+
     if (!queryStrings.feedUrl) {
-      history.replace('/')
+      setFeed(null)
+    }
+    if (queryStrings.feedUrl !== feedUrl) {
+      setFeedUrl(queryStrings.feedUrl)
+      setFeed(null)
     }
 
     if (!feed) {
@@ -17,14 +24,20 @@ export function Rss({ location, history }) {
         .then((res) => res.json())
         .then((jsonFeed) => {
           prepareFeed(jsonFeed)
-          saveFeed(jsonFeed)
+          setFeed(jsonFeed)
         })
         .catch((error) => console.log(error))
     } else {
       prepareFeed(feed)
-      console.log(feed)
     }
   })
+
+  const searchFeed = (e) => {
+    e.preventDefault()
+    if (e.keyCode == 13) {
+      history.push(`rss?feedUrl=${e.target.value}`)
+    }
+  }
 
   const prepareFeed = (feed) => {
     if (feed.imgArticleCount) {
@@ -46,10 +59,14 @@ export function Rss({ location, history }) {
   }
 
   if (!feed) {
-    return (<div></div>)
+    return (
+      <div className='container'>
+        <RssSearch onEnterHandler={searchFeed} />
+      </div>)
   } else {
     return (
       <div className='container'>
+        <RssSearch onEnterHandler={searchFeed} />
         <h2>{feed.title}</h2>
         <span>{reportArticles(feed)}</span>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import bootstrap from 'bootstrap-4-grid'
 import './index.css';
 import { App } from './pages/App'
 import * as serviceWorker from './serviceWorker';
