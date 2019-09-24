@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS feed
      name       STRING NOT NULL, 
      url        STRING NOT NULL, 
      fk_user_id INTEGER NOT NULL,
+     UNIQUE (fk_user_id, name),
      FOREIGN KEY (fk_user_id) REFERENCES user (id)
   );
 

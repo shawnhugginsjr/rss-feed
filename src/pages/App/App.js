@@ -29,7 +29,6 @@ export function App() {
     }
   })
 
-
   const NotFound = () => {
     return (
       <div>Not found</div>
@@ -39,7 +38,7 @@ export function App() {
     <Router>
       <Switch>
         <Route exact path='/' render={(props) => <Rss {...props} user={user} />} />
-        <Route path='/rss' render={(props) => <Rss {...props} user={user} />} />
+        <Route path='/rss' render={(props) => <Rss {...props} user={user} setUser={setUser} />} />
         <Route path='/signin' render={(props) => <Auth {...props} mode={'signin'} user={user} handleAuth={setUser} />} />
         <Route path='/signup' render={(props) => <Auth {...props} mode={'signup'} user={user} handleAuth={setUser} />} />
         <Route component={NotFound} />

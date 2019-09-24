@@ -12,7 +12,7 @@ const app = express()
 const PORT = 8000
 const saltRounds = 10;
 const rssParser = new rParser()
-const max_item_count = 50
+const max_item_count = 30
 
 // Resolves a database connection from the promise.
 const dbPromise = Promise.resolve()
@@ -85,14 +85,21 @@ app.post('/feed', async (req, res, next) => {
             sendError(res, code.unauthorized, 'User must be logged in to save a feed.')
             return
         }
+
         if (!req.body.feedName || !req.body.feedUrl) {
             sendError(res, code.badRequest, 'Both query parameters "feedName" and "feedUrl" are required.')
             return
         }
 
         const db = await dbPromise
-        await db.run(sql.followFeed, req.body.feedName, req.body.feedUrl, req.session.userID)
-        res.send('ok')
+        const queryResult = await db.run(sql.followFeed, req.body.feedName, req.body.feedUrl, req.session.userID)
+        res.send({
+            feed: {
+                id: queryResult.lastID,
+                name: req.body.feedName,
+                url: req.body.feedUrl
+            }
+        })
     } catch (error) {
         next(error)
     }
@@ -113,7 +120,11 @@ app.delete('/feed', async (req, res, next) => {
 
         const db = await dbPromise
         await db.run(sql.deleteFeed, req.session.userID, req.body.feedID)
-        res.send('feed deleted')
+        res.send({
+            feed: {
+                id: req.body.feedID
+            }
+        })
     } catch (error) {
         next(error)
     }
