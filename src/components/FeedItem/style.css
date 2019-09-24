@@ -1,8 +1,48 @@
 .feed-item {
-    padding: 0.5em;
+    padding: 0.5em 0em;
     width: 100%;
+    max-width: 635px;
+    max-height: 200px;
+    overflow: hidden;
+    font-family: sans-serif;
 }
 
-.content {
+.pubdate {
     overflow: hidden;
+    color:#9e9e9e;
+    line-height: 18px;
+    font-size: 13px;
 }
+
+.summary {
+    overflow: hidden;
+    color:#9e9e9e;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    line-height: 18px;
+    max-height: 57px;
+}
+
+.title {
+    color: (51, 51, 51);
+}
+
+a:link {
+    color: #333333;
+  }
+  
+  /* visited link */
+  a:visited {
+    color: green;
+  }
+  
+  /* mouse over link */
+  a:hover {
+    color: hotpink;
+  }
+  
+  /* selected link */
+  a:active {
+    color: blue;
+  }

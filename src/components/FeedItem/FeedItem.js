@@ -3,7 +3,7 @@ import './style.css'
 
 export function FeedItem({ feedItem }) {
     let title = feedItem.title ? feedItem.title : ''
-    let link = feedItem.link ? feedItem.link : '#'
+    let link = feedItem.link ? feedItem.link : null
     let img = feedItem.enclosure ? feedItem.enclosure.url : '#'
     let pubDate = feedItem.pubDate ? feedItem.pubDate : 'No Publication Date'
     let content = ''
@@ -14,15 +14,34 @@ export function FeedItem({ feedItem }) {
         content = FeedItem.description
     }
 
+    const Image = ({image_url}) => {
+        let jsx = (null)
+        console.log(image_url)
+        if (image_url) {
+            const sectionStyle = {
+                width: "100px",
+                height: "90px",
+                backgroundImage: `url(${image_url})`
+              }
+
+            jsx = (
+                <div style={sectionStyle}></div>
+            )
+        }
+        return jsx
+    }
+
     return (
         <div className='feed-item'>
-            <div></div>
+            <div>
+                
+            </div>
             <div>
                 <div>
-                    <a href={link}>{title}</a>
+                    <a className='title' href={link}>{title}</a>
                 </div>
-                <div>{pubDate}</div>
-                <p>{content}</p>
+                <div className='pubdate'>{pubDate}</div>
+                <div className='summary'>{content}</div>
             </div>
         </div>
     )

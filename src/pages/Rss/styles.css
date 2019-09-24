@@ -4,10 +4,23 @@
     position: fixed;
     top: 0;
     height: 100%;
+    padding: 2em 1em 2em 1em;
     margin-right: 10px;
 }
 
+.sidebar .content {
+    text-align: center;
+    margin: 0 auto;
+    padding: 2em, 1em, 2em, 1em;
+}
+
 .right-side {
-    padding-top: 60px;
+    padding: 2em 3em 2em 3em;
     margin-left: 330px;
+}
+
+.feed-title {
+    font-size: 22px;
+    font-weight: bold;
+    padding: 10px 0px 5px 0px;
 }
