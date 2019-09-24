@@ -61,7 +61,7 @@ export function Rss({ location, history, user, setUser }) {
   return (
     <div>
       <div className='sidebar'>
-        <UserSideBar user={user} />
+        <UserSideBar user={user} setUser={setUser} />
       </div>
       <div className='right-side'>
         <RightContent onEnterHandler={searchFeed} user={user} feed={feed} setUser={setUser} />
@@ -95,13 +95,13 @@ const RightContent = ({ feed, user, setUser, onEnterHandler }) => {
   return jsx
 }
 
-const UserSideBar = ({ user }) => {
-  console.log(user)
+const UserSideBar = ({ user, setUser }) => {
   let jsx = (null)
   if (user) {
     jsx = (
       <div className='content'>
         <UserFeedItemList userFeedItemArray={user.feeds} />
+        <button onClick={() => logout(setUser)}>Log Out</button>
       </div>
     )
   } else {
@@ -136,13 +136,37 @@ const AuthButtons = ({ user }) => {
   return jsx
 }
 
+const logout = async (setUser) => {
+  try {
+    const res = await fetch('/logout', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: null
+    })
+
+    const body = await res.json()
+
+    if (body.error) {
+      throw body.error
+    }
+
+    setUser(null)
+  } catch (error) {
+    console.log(error)
+    // Display an error response to user.
+  }
+}
+
 const followFeed = async (feed, user, setUser) => {
   try {
     const feedPayload = {
       feedName: feed.title,
       feedUrl: feed.feedUrl
     }
-    
+
     const res = await fetch('/feed', {
       method: 'POST',
       headers: {
@@ -151,7 +175,7 @@ const followFeed = async (feed, user, setUser) => {
       },
       body: JSON.stringify(feedPayload)
     })
-    
+
     const body = await res.json()
 
     if (body.error) {

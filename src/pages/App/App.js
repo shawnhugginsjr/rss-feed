@@ -37,7 +37,7 @@ export function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path='/' render={(props) => <Rss {...props} user={user} />} />
+        <Route exact path='/' render={(props) => <Rss {...props} user={user} setUser={setUser} />} />
         <Route path='/rss' render={(props) => <Rss {...props} user={user} setUser={setUser} />} />
         <Route path='/signin' render={(props) => <Auth {...props} mode={'signin'} user={user} handleAuth={setUser} />} />
         <Route path='/signup' render={(props) => <Auth {...props} mode={'signup'} user={user} handleAuth={setUser} />} />
