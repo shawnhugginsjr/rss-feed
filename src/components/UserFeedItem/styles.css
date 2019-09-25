@@ -1,0 +1,25 @@
+
+.user-item-wrapper {
+    overflow-x: hidden;
+}
+ 
+.sidebar a {
+    display: block;
+    color: #333333;
+    font-weight: 600;
+}
+
+.sidebar a:hover {
+    color: #333333;
+    background-color: #E9EAEC;
+}
+
+.feed-name {
+    display: block;
+    width: 260px;
+    height: 30px;
+    padding-top: 5px;
+    margin-left: 40px;
+    overflow-x: hidden;
+    font-size: 13px;
+}

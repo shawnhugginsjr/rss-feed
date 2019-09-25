@@ -9,10 +9,15 @@
 
 .sidebar .content {
     overflow-x: hidden;
-    overflow-y: auto;
-    text-align: center;
+    overflow-y: scroll;
     margin: 0 auto;
-    padding: 2em, 1em, 2em, 1em;
+    padding-top: 32px;
+    height: 95%;
+}
+
+.sidebar .content .feed-header {
+    color: #a4a4a4;
+    margin-left: 20px;
 }
 
 .right-side {
@@ -37,6 +42,15 @@
 
 /* Logout Button */
 .logout {
-
+    position: absolute;
+    width: 100%;
+    height: 5%;
     bottom: 0;
+    padding-top: 2px;
+    background-color: #E9EAEC;
+    text-align: center;
+}
+
+.logout:hover {
+    background-color: #007bff;
 }

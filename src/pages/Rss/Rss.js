@@ -124,8 +124,10 @@ const UserSideBar = ({ user, setUser }) => {
     jsx = (
       <>
         <div className='content'>
+          <span className='feed-header'>FEEDS</span>
           <UserFeedItemList userFeedItemArray={user.feeds} />
         </div>
+        <div onClick={() => { logout(setUser) }} className='logout'> logout</div>
       </>
     )
   } else {
@@ -143,19 +145,22 @@ const AuthButtons = ({ user }) => {
   if (!user) {
     jsx = (
       <div>
-        <Link
-          className="btn btn-pink"
-          role="button"
-          to="/signin">
-          signin
+        <div>
+          <Link
+            className="btn btn-pink"
+            role="button"
+            to="/signin">
+            Sign In
           </Link>
-        <br />
-        <Link
-          className="btn btn-pink"
-          role="button"
-          to="/signup">
-          signup
+        </div>
+        <div>
+          <Link
+            className="btn btn-pink"
+            role="button"
+            to="/signup">
+            Sign Up
           </Link>
+        </div>
       </div>
     )
   }
