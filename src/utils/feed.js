@@ -1,3 +1,30 @@
+const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
+
+export const prepareFeed = (feed, feedUrl) => {
+    if (feed.imgArticleCount) { return }
+
+    feed.imgArticleCount = 0
+    feed.feedUrl = feedUrl
+    for (let i = 0; i < feed.items.length; i++) {
+        const feedItem = feed.items[i]
+        feedItem.position = i
+        feedItem.date = Date.parse(feedItem.pubDate)
+
+        if (!feedItem.description) {
+            feedItem.description = ''
+            if (feedItem.contentSnippet) {
+                feedItem.description = feedItem.contentSnippet
+            }
+        }
+
+        feedItem.imageUrl = '#'
+        if (feedItem.enclosure && img_mime_type_set.has(feedItem.enclosure.type)) {
+            feed.imgArticleCount += 1
+            feedItem.imageUrl = feedItem.enclosure.url
+        }
+    }
+}
+
 /*
 * Sorts a list of feed items to their original positioning.
 * Function 'prepareFeed' must be called before using this comparator

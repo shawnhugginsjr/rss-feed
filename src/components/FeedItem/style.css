@@ -25,24 +25,11 @@
 }
 
 .title {
-    color: (51, 51, 51);
+    color: #333333;
 }
 
-a:link {
-    color: #333333;
-  }
-  
-  /* visited link */
-  a:visited {
-    color: green;
-  }
-  
-  /* mouse over link */
-  a:hover {
-    color: hotpink;
-  }
-  
-  /* selected link */
-  a:active {
-    color: blue;
-  }
+
+.feed-item a, .feed-item a:hover, .feed-tem a:visited {
+  color: #333333;
+  font-weight: 700;
+}

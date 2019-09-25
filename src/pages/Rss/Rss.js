@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { FeedItemList } from '../../components/FeedItemList'
 import { UserFeedItemList } from '../../components/UserFeedItemList'
 import { RssSearch } from '../../components/RssSearch'
-import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap'
-import { sortFeed, sortKeys, sortOptions } from './feedSorts'
+import { prepareFeed, sortFeed, sortKeys } from '../../utils/feed'
+import { SortDropdown } from '../../components/SortDropdown'
+import { Button, Spinner } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import './styles.css'
 const queryString = require('query-string')
@@ -13,7 +14,6 @@ export function Rss({ location, history, user, setUser }) {
   const [feedUrl, setFeedUrl] = useState(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [sort, setSort] = useState(sortKeys.original)
-  const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
   useEffect(() => {
     const queryStrings = queryString.parse(location.search)
@@ -39,34 +39,6 @@ export function Rss({ location, history, user, setUser }) {
     }
   })
 
-  /*
-  *
-  */
-  const prepareFeed = (feed, feedUrl) => {
-    if (feed.imgArticleCount) { return }
-
-    feed.imgArticleCount = 0
-    feed.feedUrl = feedUrl
-    for (let i = 0; i < feed.items.length; i++) {
-      const feedItem = feed.items[i]
-      feedItem.position = i
-      feedItem.date = Date.parse(feedItem.pubDate)
-
-      if (!feedItem.description) {
-        feedItem.description = ''
-        if (feedItem.contentSnippet) {
-          feedItem.description = feedItem.contentSnippet
-        }
-      }
-
-      feedItem.imageUrl = '#'
-      if (feedItem.enclosure && img_mime_type_set.has(feedItem.enclosure.type)) {
-        feed.imgArticleCount += 1
-        feedItem.imageUrl = feedItem.enclosure.url
-      }
-    }
-  }
-
   const changeSort = (sortKey) => {
     sortFeed(feed, sortKey)
     setSort(sortKey)
@@ -81,6 +53,19 @@ export function Rss({ location, history, user, setUser }) {
     if (e.keyCode == 13) {
       history.push(`rss?feedUrl=${e.target.value}`)
     }
+  }
+
+  if (!feedUrl) {
+    return (
+      <div>
+        <div className='sidebar'>
+          <UserSideBar user={user} setUser={setUser} />
+        </div>
+        <div className='right-side'>
+          <RssSearch onEnterHandler={searchFeed} />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -107,31 +92,26 @@ const RightContent = ({ feed, user, setUser, onEnterHandler, isOpen, setDropdown
   if (feed) {
     jsx = (
       <div>
-        <AuthButtons user={user} />
         <RssSearch onEnterHandler={onEnterHandler} />
-        <div className='feed-title'>{feed.title}</div>
-        <div>{`${feed.items.length} Articles / ${feed.imgArticleCount} Article Images`}</div>
-        <FollowButton user={user} feed={feed} setUser={setUser} />
-        <Dropdown isOpen={isOpen} toggle={() => { setDropdownOpen(prevState => { return !prevState }) }}>
-          <DropdownToggle caret>
-            {sortOptions[sort]}
-          </DropdownToggle>
-          <DropdownMenu>
-            <DropdownItem onClick={() => changeSort(sortKeys.original)}>Original</DropdownItem>
-            <DropdownItem onClick={() => changeSort(sortKeys.title)} >Title</DropdownItem>
-            <DropdownItem onClick={() => changeSort(sortKeys.description)} >Description Length</DropdownItem>
-            <DropdownItem onClick={() => changeSort(sortKeys.pubDate)} >Date</DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+        <div className='feed-title-container'>
+          <span className='feed-title'>{feed.title}</span>
+          <FollowButton className='follow' user={user} feed={feed} setUser={setUser} />
+        </div>
+        <div>
+          {`${feed.items.length} Articles / ${feed.imgArticleCount} Article Images`}
+        </div>
+        <div>
+          <span>Article Sort Option:</span>
+          <SortDropdown isOpen={isOpen} sort={sort} setDropdownOpen={setDropdownOpen} changeSort={changeSort} />
+        </div>
         <FeedItemList feedItemArray={feed.items} />
       </div>
     )
   } else {
     jsx = (
       <div>
-        <AuthButtons user={user} />
         <RssSearch onEnterHandler={onEnterHandler} />
-        <div>Loading...</div>
+        <Spinner size="sm" color="primary" />{' '}
       </div>
     )
   }
@@ -142,14 +122,17 @@ const UserSideBar = ({ user, setUser }) => {
   let jsx = (null)
   if (user) {
     jsx = (
-      <div className='content'>
-        <UserFeedItemList userFeedItemArray={user.feeds} />
-        <button onClick={() => logout(setUser)}>Log Out</button>
-      </div>
+      <>
+        <div className='content'>
+          <UserFeedItemList userFeedItemArray={user.feeds} />
+        </div>
+      </>
     )
   } else {
     jsx = (
-      <div></div>
+      <div className='content'>
+        <AuthButtons user={user} />
+      </div>
     )
   }
   return jsx
@@ -285,11 +268,11 @@ const FollowButton = ({ user, feed, setUser }) => {
 
     if (foundIndex >= 0) {
       jsx = (
-        <button onClick={() => unFollowFeed(user, setUser, foundIndex)}>unFollow</button>
+        <Button color='primary' size='sm' onClick={() => unFollowFeed(user, setUser, foundIndex)}>Following</Button>
       )
     } else {
       jsx = (
-        <button onClick={() => followFeed(feed, user, setUser)}>Follow</button>
+        <Button outline color='secondary' size='sm' onClick={() => followFeed(feed, user, setUser)}>Follow</Button>
       )
     }
   }
