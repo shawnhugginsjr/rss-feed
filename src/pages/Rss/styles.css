@@ -40,7 +40,10 @@
 }
 
 
-/* Logout Button */
+.alert-danger {
+    margin-top: 10px;
+}
+
 .logout {
     position: absolute;
     width: 100%;

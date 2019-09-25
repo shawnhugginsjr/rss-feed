@@ -4,7 +4,7 @@ import { UserFeedItemList } from '../../components/UserFeedItemList'
 import { RssSearch } from '../../components/RssSearch'
 import { prepareFeed, sortFeed, sortKeys } from '../../utils/feed'
 import { SortDropdown } from '../../components/SortDropdown'
-import { Button, Spinner } from 'reactstrap'
+import { Button, Spinner, Alert } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import './styles.css'
 const queryString = require('query-string')
@@ -14,6 +14,7 @@ export function Rss({ location, history, user, setUser }) {
   const [feedUrl, setFeedUrl] = useState(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [sort, setSort] = useState(sortKeys.original)
+  const [reqFail, setReqFail] = useState(false)
 
   useEffect(() => {
     const queryStrings = queryString.parse(location.search)
@@ -24,6 +25,7 @@ export function Rss({ location, history, user, setUser }) {
     }
     if (queryStrings.feedUrl !== feedUrl) {
       setFeedUrl(queryStrings.feedUrl)
+      setReqFail(false)
       setFeed(null)
       return
     }
@@ -35,7 +37,10 @@ export function Rss({ location, history, user, setUser }) {
           prepareFeed(jsonFeed, queryStrings.feedUrl)
           setFeed(jsonFeed)
         })
-        .catch((error) => console.log(error))
+        .catch((error) => {
+          console.log(error)
+          setReqFail(true)
+        })
     }
   })
 
@@ -53,6 +58,24 @@ export function Rss({ location, history, user, setUser }) {
     if (e.keyCode == 13) {
       history.push(`rss?feedUrl=${e.target.value}`)
     }
+  }
+
+  if (reqFail) {
+    return (
+      <div>
+        <div className='sidebar'>
+          <UserSideBar user={user} setUser={setUser} />
+        </div>
+        <div className='right-side'>
+          <RssSearch onEnterHandler={searchFeed} />
+          <div className='alert-danger'>
+            <Alert color='danger'>
+            Could not load Feed.
+            </Alert>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (!feedUrl) {
