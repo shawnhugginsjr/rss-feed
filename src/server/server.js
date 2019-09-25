@@ -13,7 +13,7 @@ const app = express()
 const PORT = 8000
 const saltRounds = 10;
 const rssParser = new rParser()
-const max_item_count = 30
+const max_item_count = 50
 
 // Resolves a database connection from the promise.
 const dbPromise = Promise.resolve()
