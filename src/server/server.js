@@ -59,10 +59,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'))
 })
 
-app.get('/rss', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'))
-})
-
 /*
 * Sends a JSON format of the RSS feed specified by the
 * query paramter 'feedUrl' to the client.
@@ -244,6 +240,10 @@ app.post('/signup', async (req, res, next) => {
     } catch (error) {
         next(error)
     }
+})
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'))
 })
 
 app.listen(PORT, () => console.log(`RSS server listening on port ${PORT}!`))
