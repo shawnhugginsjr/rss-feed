@@ -7,7 +7,8 @@ Run these commands from the root directory after pulling down the repo.
 ```
 > npm install
 > npm run build
-> node ./src/server/server.js
+> cd src/server
+> node server.js
 RSS server listening on port 8000!
 ```
 
