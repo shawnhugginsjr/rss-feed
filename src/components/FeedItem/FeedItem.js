@@ -8,29 +8,23 @@ export function FeedItem({ feedItem }) {
     let pubDate = feedItem.pubDate ? feedItem.pubDate : 'No Publication Date'
     let content = feedItem.description
 
-    const Image = ({ image_url }) => {
+    const Image = ({ imageUrl }) => {
         let jsx = (null)
-        console.log(image_url)
-        if (image_url) {
-            const sectionStyle = {
-                width: "100px",
-                height: "90px",
-                backgroundImage: `url(${image_url})`
-            }
 
+        if (imageUrl) {
             jsx = (
-                <div style={sectionStyle}></div>
+                <img src={imageUrl} ></img>
             )
         }
         return jsx
     }
 
     return (
-        <div className='feed-item'>
-            <div>
-
+        <div className='feed-item row' >
+            <div className='col-lg-2 img-container'>
+                <Image imageUrl={imgUrl} />
             </div>
-            <div>
+            <div className='col-lg-10'>
                 <div>
                     <a className='title' href={link} target='_blank'>{title}</a>
                 </div>
@@ -40,19 +34,3 @@ export function FeedItem({ feedItem }) {
         </div>
     )
 }
-
-/*
-FeedItem Schema
-Contenet and enclosure may not exist
-
-
-"title": "Hubble Takes Closer Look at Not-So-'Dead' Neighbor",
-"link": "http://www.nasa.gov/image-feature/goddard/2019/hubble-takes-closer-look-at-not-so-dead-neighbor",
-"content": "",
-"pubDate": "Fri, 20 Sep 2019 09:27 EDT",
-"enclosure": { (may no)
-    "url": "http://www.nasa.gov/sites/default/files/thumbnails/image/potw1937a.jpg",
-    "length": "919436",
-    "type": "image/jpeg"
-   },
-*/

@@ -28,6 +28,14 @@
     color: #333333;
 }
 
+img {
+    width: 100%;
+    min-width: 75px;
+    height: 90px;
+    margin-top: 4px;
+    border-radius: 10px;
+    background-color: #9e9e9e;
+}
 
 .feed-item a, .feed-item a:hover, .feed-tem a:visited {
   color: #333333;

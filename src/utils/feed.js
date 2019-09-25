@@ -39,7 +39,7 @@ export const prepareFeed = (feed, feedUrl) => {
         }
         feedItem.description = cleanString(feedItem.description)
 
-        feedItem.imageUrl = '#'
+        feedItem.imageUrl = null
         if (feedItem.enclosure && img_mime_type_set.has(feedItem.enclosure.type)) {
             feed.imgArticleCount += 1
             feedItem.imageUrl = feedItem.enclosure.url
