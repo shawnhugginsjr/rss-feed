@@ -5,15 +5,15 @@
 CREATE TABLE IF NOT EXISTS user 
   ( 
      id                INTEGER PRIMARY KEY AUTOINCREMENT, 
-     username          STRING UNIQUE NOT NULL, 
-     password_hash     STRING NOT NULL
+     username          TEXT UNIQUE NOT NULL, 
+     password_hash     TEXT NOT NULL
   ); 
 
 CREATE TABLE IF NOT EXISTS feed 
   ( 
      id         INTEGER PRIMARY KEY AUTOINCREMENT, 
-     name       STRING NOT NULL, 
-     url        STRING NOT NULL, 
+     name       TEXT NOT NULL, 
+     url        TEXT NOT NULL, 
      fk_user_id INTEGER NOT NULL,
      UNIQUE (fk_user_id, name),
      FOREIGN KEY (fk_user_id) REFERENCES user (id)
