@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import './styles.css'
 
 export function SignInOrUp({ mode, handleAuth, history }) {
     const [username, setUsername] = useState('')
@@ -65,22 +66,26 @@ export function SignInOrUp({ mode, handleAuth, history }) {
     }
 
     return (
-        <div>
+        <div className='boundary'>
             <form>
-                <label>
-                    Username
+                <div>
+                    <label>
+                        Username:
                 <input type='text'
-                        name='username'
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)} />
-                </label>
-                <label>
-                    Password
+                            name='username'
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)} />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Password:
                 <input type='text'
-                        name='password'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)} />
-                </label>
+                            name='password'
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)} />
+                    </label>
+                </div>
                 <div>{SubmitButton()}</div>
                 <div>{error ? error.message : null}</div>
             </form>

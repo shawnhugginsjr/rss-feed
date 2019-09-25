@@ -1,0 +1,12 @@
+.boundary {
+    margin: 0 auto;
+    background-color: aqua;
+    max-width: 500px;
+    margin: 5% auto 15% auto;
+    width: 100%;
+    height: 150px;
+    border: 1px solid #888;
+    align-content: center;
+    padding: 10px;
+    border-radius: 50px
+}
