@@ -1,5 +1,25 @@
 const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
+/*
+* Removes any HTML entities and HTML tags from a string.
+*/
+const cleanString = (input) => {
+    if (!input) {
+        return ''
+    }
+
+    // First unescape any html entities.
+    const text = new DOMParser().parseFromString(input, "text/html").documentElement.textContent
+    // Remove HTML tages from the string.
+    text.replace(/<[^>]*>?/gm, '')
+    return text
+}
+
+/*
+* Attempts to normalize a RSS Feed into a format that is
+* easy to display and manipulate. This should be called for
+* every Feed retrieved.
+*/
 export const prepareFeed = (feed, feedUrl) => {
     if (feed.imgArticleCount) { return }
 
@@ -7,6 +27,7 @@ export const prepareFeed = (feed, feedUrl) => {
     feed.feedUrl = feedUrl
     for (let i = 0; i < feed.items.length; i++) {
         const feedItem = feed.items[i]
+        feedItem.title = cleanString(feedItem.title)
         feedItem.position = i
         feedItem.date = Date.parse(feedItem.pubDate)
 
@@ -16,6 +37,7 @@ export const prepareFeed = (feed, feedUrl) => {
                 feedItem.description = feedItem.contentSnippet
             }
         }
+        feedItem.description = cleanString(feedItem.description)
 
         feedItem.imageUrl = '#'
         if (feedItem.enclosure && img_mime_type_set.has(feedItem.enclosure.type)) {
