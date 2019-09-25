@@ -1,23 +1,44 @@
 import React, { useState } from 'react'
 import './styles.css'
+import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap'
 
 export function SignInOrUp({ mode, handleAuth, history }) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState(null)
 
-    const SubmitButton = () => {
+    const Header = () => {
+        let headerText = ''
         if (mode === 'signin') {
-            return (
-                <input type="submit" value="Sign In" onClick={(e) => attemptAuth(e)} />
-            )
+            headerText = 'Sign In'
         } else if (mode === 'signup') {
-            return (
-                <input type="submit" value="Sign Up" onClick={(e) => attemptAuth(e)} />
-            )
+            headerText = 'Sign Up'
         } else {
             console.log('Incorrect mode used ', mode)
         }
+
+        return(
+            <>
+            <h2>{headerText}</h2>
+            <hr/>
+            </>
+        )
+    }
+
+    const SubmitButton = () => {
+        let buttonText = ''
+        if (mode === 'signin') {
+            buttonText = 'Sign In'
+        } else if (mode === 'signup') {
+            buttonText = 'Sign Up'
+        } else {
+            console.log('Incorrect mode used ', mode)
+        }
+        return (
+            <Button value="Sign In" onClick={(e) => attemptAuth(e)} block>
+                {buttonText}
+            </Button>
+        )
     }
 
     const attemptAuth = async (event) => {
@@ -66,29 +87,30 @@ export function SignInOrUp({ mode, handleAuth, history }) {
     }
 
     return (
-        <div className='boundary'>
-            <form>
-                <div>
-                    <label>
-                        Username:
-                <input type='text'
-                            name='username'
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)} />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Password:
-                <input type='text'
-                            name='password'
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)} />
-                    </label>
-                </div>
-                <div>{SubmitButton()}</div>
-                <div>{error ? error.message : null}</div>
-            </form>
+        <div className='form-container'>
+            <Header />
+            <Form>
+                <FormGroup>
+                    <Label for="username">Username</Label>
+                    <Input
+                        type="text"
+                        name="username"
+                        id="username"
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter your username" />
+                </FormGroup>
+                <FormGroup>
+                    <Label for="Password">Password</Label>
+                    <Input
+                        type="password"
+                        name="password"
+                        id="username"
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password" />
+                </FormGroup>
+                <SubmitButton />
+                <div className='error'>{error ? error.message : null}</div>
+            </Form>
         </div>
     )
 }
