@@ -17,7 +17,7 @@ const max_item_count = 30
 // Resolves a database connection from the promise.
 const dbPromise = Promise.resolve()
     .then(() => sqlite.open('./database.sqlite', { Promise }))
-    .then(db => db.migrate({ force: 'last' }))
+    .then(db => db.migrate())
     .catch((error) => {
         console.log(`Server could not start: ${error}`)
     })
