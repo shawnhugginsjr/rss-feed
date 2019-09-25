@@ -31,7 +31,7 @@ export function Rss({ location, history, user, setUser }) {
     }
 
     if (!feed) {
-      fetch(`/rss?feedUrl=${queryStrings.feedUrl}`)
+      fetch(`/feed?feedUrl=${queryStrings.feedUrl}`)
         .then((res) => res.json())
         .then((jsonFeed) => {
           prepareFeed(jsonFeed, queryStrings.feedUrl)

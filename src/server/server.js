@@ -7,6 +7,7 @@ const morgan = require('morgan')
 const rParser = require('rss-parser')
 const code = require('./statusCodes')
 const sql = require('./sql')
+const path = require('path')
 const app = express()
 
 const PORT = 8000
@@ -52,13 +53,21 @@ app.use(session({
 
 app.use(bodyParser.json())
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.use(express.static(path.join(__dirname, '..', '..', 'build')))
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'))
+})
+
+app.get('/rss', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'))
+})
 
 /*
 * Sends a JSON format of the RSS feed specified by the
 * query paramter 'feedUrl' to the client.
 */
-app.get('/rss', async (req, res, next) => {
+app.get('/feed', async (req, res, next) => {
     try {
         const feedUrl = req.query.feedUrl
         if (!feedUrl) {
