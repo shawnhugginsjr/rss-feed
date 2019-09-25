@@ -1,14 +1,15 @@
 .sidebar {
     width: 300px;
-    background-color: yellowgreen;
+    background-color: #f6f7f8;
     position: fixed;
     top: 0;
     height: 100%;
-    padding: 2em 1em 2em 1em;
     margin-right: 10px;
 }
 
 .sidebar .content {
+    overflow-x: hidden;
+    overflow-y: auto;
     text-align: center;
     margin: 0 auto;
     padding: 2em, 1em, 2em, 1em;
@@ -19,8 +20,23 @@
     margin-left: 330px;
 }
 
+.feed-title-container {
+    padding: 10px 0px 5px 0px;
+}
+
 .feed-title {
     font-size: 22px;
     font-weight: bold;
-    padding: 10px 0px 5px 0px;
+    padding-right: 5px;
+}
+
+.follow {
+    margin-left: 10px;
+}
+
+
+/* Logout Button */
+.logout {
+
+    bottom: 0;
 }

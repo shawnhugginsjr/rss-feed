@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import './styles.css'
 
 export function RssSearch({ onEnterHandler }) {
     const [searchFeed, setSearchFeed] = useState('')
