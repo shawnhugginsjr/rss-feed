@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { FeedItemList } from '../../components/FeedItemList'
 import { UserFeedItemList } from '../../components/UserFeedItemList'
 import { RssSearch } from '../../components/RssSearch'
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap'
+import { sortFeed, sortKeys, sortOptions } from './feedSorts'
 import { Link } from 'react-router-dom'
 import './styles.css'
 const queryString = require('query-string')
@@ -9,6 +11,8 @@ const queryString = require('query-string')
 export function Rss({ location, history, user, setUser }) {
   const [feed, setFeed] = useState(null)
   const [feedUrl, setFeedUrl] = useState(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [sort, setSort] = useState(sortKeys.original)
   const img_mime_type_set = new Set(['image/jpeg', 'image/png'])
 
   useEffect(() => {
@@ -35,20 +39,41 @@ export function Rss({ location, history, user, setUser }) {
     }
   })
 
+  /*
+  *
+  */
   const prepareFeed = (feed, feedUrl) => {
-    if (feed.imgArticleCount) {
-      return
-    }
+    if (feed.imgArticleCount) { return }
 
     feed.imgArticleCount = 0
     feed.feedUrl = feedUrl
-    feed.items.forEach((item, index) => {
-      if (item.enclosure && img_mime_type_set.has(item.enclosure.type)) {
-        feed.imgArticleCount += 1
-      } else {
-        feed.items[index].enclosure = null
+    for (let i = 0; i < feed.items.length; i++) {
+      const feedItem = feed.items[i]
+      feedItem.position = i
+      feedItem.date = Date.parse(feedItem.pubDate)
+
+      if (!feedItem.description) {
+        feedItem.description = ''
+        if (feedItem.contentSnippet) {
+          feedItem.description = feedItem.contentSnippet
+        }
       }
+
+      feedItem.imageUrl = '#'
+      if (feedItem.enclosure && img_mime_type_set.has(feedItem.enclosure.type)) {
+        feed.imgArticleCount += 1
+        feedItem.imageUrl = feedItem.enclosure.url
+      }
+    }
+  }
+
+  const changeSort = (sortKey) => {
+    sortFeed(feed, sortKey)
+    setSort(sortKey)
+    setFeed(prevFeed => {
+      return { ...prevFeed, ...feed }
     })
+    console.log('Sorting done ', sortKey)
   }
 
   const searchFeed = (e) => {
@@ -64,13 +89,20 @@ export function Rss({ location, history, user, setUser }) {
         <UserSideBar user={user} setUser={setUser} />
       </div>
       <div className='right-side'>
-        <RightContent onEnterHandler={searchFeed} user={user} feed={feed} setUser={setUser} />
+        <RightContent onEnterHandler={searchFeed}
+          user={user}
+          feed={feed}
+          setUser={setUser}
+          isOpen={dropdownOpen}
+          setDropdownOpen={setDropdownOpen}
+          changeSort={changeSort}
+          sort={sort} />
       </div>
     </div>
   )
 }
 
-const RightContent = ({ feed, user, setUser, onEnterHandler }) => {
+const RightContent = ({ feed, user, setUser, onEnterHandler, isOpen, setDropdownOpen, changeSort, sort }) => {
   let jsx = (null)
   if (feed) {
     jsx = (
@@ -80,6 +112,17 @@ const RightContent = ({ feed, user, setUser, onEnterHandler }) => {
         <div className='feed-title'>{feed.title}</div>
         <div>{`${feed.items.length} Articles / ${feed.imgArticleCount} Article Images`}</div>
         <FollowButton user={user} feed={feed} setUser={setUser} />
+        <Dropdown isOpen={isOpen} toggle={() => { setDropdownOpen(prevState => { return !prevState }) }}>
+          <DropdownToggle caret>
+            {sortOptions[sort]}
+          </DropdownToggle>
+          <DropdownMenu>
+            <DropdownItem onClick={() => changeSort(sortKeys.original)}>Original</DropdownItem>
+            <DropdownItem onClick={() => changeSort(sortKeys.title)} >Title</DropdownItem>
+            <DropdownItem onClick={() => changeSort(sortKeys.description)} >Description Length</DropdownItem>
+            <DropdownItem onClick={() => changeSort(sortKeys.pubDate)} >Date</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
         <FeedItemList feedItemArray={feed.items} />
       </div>
     )
