@@ -39,6 +39,11 @@
     margin-left: 10px;
 }
 
+.dropdown-container {
+    display: inline-block;
+    margin-left: 10px;
+}
+
 
 .alert-danger {
     margin-top: 10px;

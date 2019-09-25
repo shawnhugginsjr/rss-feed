@@ -125,7 +125,9 @@ const RightContent = ({ feed, user, setUser, onEnterHandler, isOpen, setDropdown
         </div>
         <div>
           <span>Article Sort Option:</span>
+          <div className='dropdown-container'>
           <SortDropdown isOpen={isOpen} sort={sort} setDropdownOpen={setDropdownOpen} changeSort={changeSort} />
+          </div>
         </div>
         <FeedItemList feedItemArray={feed.items} />
       </div>
@@ -170,7 +172,7 @@ const AuthButtons = ({ user }) => {
       <div>
         <div>
           <Link
-            className="btn btn-pink"
+            className="btn"
             role="button"
             to="/signin">
             Sign In
@@ -178,7 +180,7 @@ const AuthButtons = ({ user }) => {
         </div>
         <div>
           <Link
-            className="btn btn-pink"
+            className="btn"
             role="button"
             to="/signup">
             Sign Up
@@ -210,7 +212,6 @@ const logout = async (setUser) => {
     setUser(null)
   } catch (error) {
     console.log(error)
-    // Display an error response to user.
   }
 }
 
@@ -234,7 +235,6 @@ const followFeed = async (feed, user, setUser) => {
 
     if (body.error) {
       console.log(body.error)
-      // Display error result to User
       return
     }
 
@@ -245,7 +245,6 @@ const followFeed = async (feed, user, setUser) => {
     })
   } catch (error) {
     console.log(error)
-    // Display error result to User
     return
   }
 }
@@ -268,11 +267,8 @@ const unFollowFeed = async (user, setUser, userFeedIndex) => {
     const body = await res.json()
     if (body.error) {
       console.log(body.error)
-      // Display error result to User
       return
     }
-    console.log('check error')
-
 
     const newUserFeeds = [...user.feeds]
     newUserFeeds.splice(userFeedIndex, 1)
@@ -282,8 +278,6 @@ const unFollowFeed = async (user, setUser, userFeedIndex) => {
     })
   } catch (error) {
     console.log(error)
-    console.log('Feed could not be deleted')
-    // Display error result to User
   }
 }
 

@@ -108,7 +108,7 @@ const descriptionCompare = (a, b) => {
     return compare
 }
 
-export const sortOptions = ['Original', 'Title', 'Description', 'Date']
+export const sortOptions = ['Original', 'Title', 'Description Length', 'Date']
 export const sortKeys = { original: 0, title: 1, description: 2, pubDate: 3 }
 export const sortCompares = { 0: originalCompare, 1: titleCompare, 2: descriptionCompare, 3: dateCompare }
 export const sortFeed = (feed, sortKey) => {
